@@ -1,0 +1,69 @@
+#This code is for making unique identifiers from exiting plotID, subplot number, and tree tag numbers
+#This code can be used on a list of tree tag numbers which are listed numerically
+
+#Additionally, if you have tree tag numbers that are already formatted as unique IDs,
+#you can change them back into regular tag numbers for plotting from step 9
+
+#1. add unique subplot column eventID, create as many rows for number of observations
+sub <- rep(c("NNN_04_SUP"), times = 374)
+plot4$sub <- sub
+
+#2. combine plotID with Subplot 
+plot4 <- unite(plot4, subPlotID, c(sub, subPlot))
+
+colnames(plot4)
+#3. write.xlsx(plot4, "C:/plot4/NNN_04_Har2017_7_formatting.xlsx")
+
+#4. **hand edit in excel**
+#the above code led to NNN_04_SUP_0_1
+#I wanted NNN_04_SUP_01
+#due to time constraints, i modified this in excel using the "find and replace feature"
+# find: NNN_04_SUP_0_1 -> replace NNN_04_SUP_01
+#then i did it for all 25 subplots. it took ~5 minutes
+#I'm sure there is a better way to do this in r but i couldn't quickly find one.
+#the below code is based on this mod. 
+
+
+#5. add unique TT column catalogNumber, create as many rows for number of observations
+TT <- rep(c("TT"), times = 374)
+plot4$TT <- TT
+
+#6. combine plotID with Subplot 
+plot4 <- unite(plot4, catalogNumber, c(TT, catalogNumber))
+plot4
+
+#7. making unique string for catalogNumber with subplot ID
+plot4 <- unite(plot4, catalogNumber, c(subPlotID, catalogNumber), remove = FALSE) #remove = false will keep both columns
+plot4
+
+#8 I am going to hand edit for 2-6 a zero in front of each so they read:
+#NNN_04_SUP_01_TT_02
+write.xlsx(plot4, "C:/plot4/NNN_04_Har2017_7_formatting.xlsx")  #remember to change to your directory 
+
+#NAs were added by hand using Find and replace.
+
+#9. to change the catalogNumber back to a single number ("NNN_04_SUP_01_TT_01" -> "1") for plotting and visualization
+# List of numbers with common prefix
+
+plot4 <- read.csv() #upload your data if not already
+
+# create an empty vector where your eventual cleaned numbers will go
+cleaned_numbers <- c()
+
+# Loop through catalog numbers
+for (i in 1) {
+  # Create the input string from your data
+  input_string <- plot4$catalogNumber   #change to your data
+  
+  # Remove the unique ID prefix
+  cleaned_string <- gsub("NNN_04_SUP_\\d{2}_TT_", "", input_string)
+  
+  # Append the cleaned string to the vector
+  cleaned_numbers <- c(cleaned_numbers, cleaned_string)
+}
+
+# Print the cleaned numbers
+print(cleaned_numbers)
+
+#add the tag numbers back into the code
+plot4$tagno <- cleaned_numbers  #remember to change to your data
